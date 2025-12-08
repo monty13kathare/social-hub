@@ -32,7 +32,7 @@ interface NotificationCategory {
 
 export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState<SettingsSection>('account');
-  const [userData, setUserData] = useState<User | null>(null);
+  const [userData, setUserData] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [savingStates, setSavingStates] = useState<Record<string, boolean>>({});
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -69,7 +69,6 @@ export default function SettingsPage() {
     bio: '',
     website: '',
     location: '',
-    phone: '',
     birthDate: '',
     gender: ''
   });
@@ -493,7 +492,7 @@ export default function SettingsPage() {
         <div className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <h1 className="text-3xl md:text-4xl font-bold ">
                 Settings
               </h1>
               <p className="text-slate-400 mt-2">Manage your account settings and preferences</p>
@@ -650,7 +649,7 @@ export default function SettingsPage() {
                   </div>
                   <div className="flex items-center justify-between text-xs text-slate-400 mt-1">
                     <span>Member since</span>
-                    {/* <span>{formatDate(userData.createdAt || new Date().toISOString())}</span> */}
+                    <span>{formatDate(userData.createdAt || new Date().toISOString())}</span> 
                   </div>
                 </div>
               </div>
@@ -1421,7 +1420,7 @@ export default function SettingsPage() {
                         <button
                           onClick={handleDeleteCommunitiesClick}
                           disabled={isLoading}
-                          className="px-6 py-3 bg-red-500 text-white font-medium rounded-xl hover:bg-red-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap min-w-[140px]"
+                          className="px-6 py-3 bg-red-500 text-white font-medium rounded-xl hover:bg-red-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap min-w-[200px]"
                         >
                           {isLoading ? 'Deleting...' : 'Delete Communities'}
                         </button>

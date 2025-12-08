@@ -1,8 +1,11 @@
 import axios from "axios";
 import { getToken } from "../utils/cookieHelper";
 
+const apiUrl = import.meta.env.VITE_API_URL || "";
+
 const API = axios.create({
-    baseURL: "http://localhost:5000/api/posts",
+    baseURL: `${apiUrl}/posts`,
+    //  "http://localhost:5000/api/posts",
     headers: { "Content-Type": "multipart/form-data" },
 
 });
