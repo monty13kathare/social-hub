@@ -8,25 +8,35 @@ import userPostRoutes from "./routes/userPost.routes.js";
 import communityPostRoutes from "./routes/communityPost.routes.js";
 import communityRoutes from "./routes/community.routes.js";
 
-import { createServer } from "http"; 
-import { Server } from "socket.io";
+// import { createServer } from "http"; 
+// import { Server } from "socket.io";
 
 dotenv.config();
 
 const app = express();
-const httpServer = createServer(app); // create HTTP server for Socket.IO
+// const httpServer = createServer(app); // create HTTP server for Socket.IO
 
-const io = new Server(httpServer, {
-  cors: {
-    origin: "*", // for development, change this in production
-    methods: ["GET", "POST"],
-  },
-});
+// const io = new Server(httpServer, {
+//   cors: {
+//     origin: "*", // for development, change this in production
+//     methods: ["GET", "POST"],
+//   },
+// });
 
 const PORT = process.env.PORT || 5000;
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://social-hub-2-u2ug.onrender.com",  // Backend
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
+
 // Middleware
-app.use(cors());
+// app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -46,20 +56,20 @@ app.get("/", (req, res) => {
 });
 
 // Socket.IO connection
-io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+// io.on("connection", (socket) => {
+//   console.log("User connected:", socket.id);
 
-  socket.on("sendMessage", (data) => {
-    console.log("Message:", data);
-    io.emit("receiveMessage", data); // broadcast to all clients
-  });
+//   socket.on("sendMessage", (data) => {
+//     console.log("Message:", data);
+//     io.emit("receiveMessage", data); // broadcast to all clients
+//   });
 
-  socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
-  });
-});
+//   socket.on("disconnect", () => {
+//     console.log("User disconnected:", socket.id);
+//   });
+// });
 
 // Start server using httpServer (NOT app.listen)
-httpServer.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
