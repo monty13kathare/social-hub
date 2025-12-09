@@ -14,27 +14,28 @@ import communityRoutes from "./routes/community.routes.js";
 dotenv.config();
 
 const app = express();
-// const httpServer = createServer(app); // create HTTP server for Socket.IO
 
-// const io = new Server(httpServer, {
-//   cors: {
-//     origin: "*", // for development, change this in production
-//     methods: ["GET", "POST"],
-//   },
-// });
 
 const PORT = process.env.PORT || 5000;
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://social-hub-2-u2ug.onrender.com",  // Backend
-];
 
-app.use(cors({
-  origin: allowedOrigins,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+
+const corsOptions = {
+  origin: [
+    "http://localhost:5173",
+    "https://social-hub-2-u2ug.onrender.com",
+  ],
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
   credentials: true,
-}));
+};
+
+// Apply CORS middleware to handle cross-origin requests
+app.use(cors(corsOptions));
+
+// Preflight requests handling
+app.options("*", cors(corsOptions));
 
 
 
