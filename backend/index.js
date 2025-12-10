@@ -8,22 +8,19 @@ import userPostRoutes from "./routes/userPost.routes.js";
 import communityPostRoutes from "./routes/communityPost.routes.js";
 import communityRoutes from "./routes/community.routes.js";
 
-// import { createServer } from "http"; 
+// import { createServer } from "http";
 // import { Server } from "socket.io";
 
 dotenv.config();
 
 const app = express();
 
-
 const PORT = process.env.PORT || 5000;
-
-
 
 const corsOptions = {
   origin: [
     "http://localhost:5173",
-    "https://social-hub-2-u2ug.onrender.com",
+    "https://social-hub-cd42.vercel.app/api",
   ],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   preflightContinue: false,
@@ -36,8 +33,6 @@ app.use(cors(corsOptions));
 
 // Preflight requests handling
 // app.options("*", cors(corsOptions));
-
-
 
 // Middleware
 app.use(express.json());
