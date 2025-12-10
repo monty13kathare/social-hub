@@ -7,7 +7,6 @@ import {
     Bell,
     Shield,
     HelpCircle,
-    ChevronDown
 } from 'lucide-react';
 import type { UserType } from '../types/types';
 

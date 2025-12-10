@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface Post {
@@ -28,7 +27,7 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post, onLike, onBookmark, onComment, onShare }: PostCardProps) {
-  const [showComments, setShowComments] = useState(false);
+  const showComments = false;
   const navigate = useNavigate();
 
   return (

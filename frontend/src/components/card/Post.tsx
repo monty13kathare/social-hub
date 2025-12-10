@@ -39,8 +39,6 @@ const Post: React.FC<PostProps> = ({
 
   const [activeReply, setActiveReply] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
-  const [likes, setLikes] = useState<{ [key: string]: number }>({});
-  const [userLiked, setUserLiked] = useState<{ [key: string]: boolean }>({});
 
   const currentUser: any = getUser();
 
@@ -278,17 +276,7 @@ const Post: React.FC<PostProps> = ({
     }
   };
 
-  const handleLike = (commentId: string) => {
-    setLikes((prev) => ({
-      ...prev,
-      [commentId]: (prev[commentId] || 0) + (userLiked[commentId] ? -1 : 1),
-    }));
-
-    setUserLiked((prev) => ({
-      ...prev,
-      [commentId]: !prev[commentId],
-    }));
-  };
+ 
 
   const handleReply = (commentId: string) => {
     setActiveReply((prev) => (prev === commentId ? null : commentId));
