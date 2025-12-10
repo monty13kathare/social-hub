@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Community, Post, User } from '../types/types';
+import type {Post, User } from '../types/types';
 import { createCommunityPost } from '../api/communityPost';
 
 interface CreatePostProps {

@@ -128,7 +128,7 @@ export const CompleteProfileStep: React.FC<CompleteProfileStepProps> = ({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="absolute -bottom-1 -right-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white p-1.5 rounded-full shadow-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-200 text-xs"
+            className="absolute -bottom-1 -right-1 bg-linear-to-r from-purple-600 to-pink-600 text-white p-1.5 rounded-full shadow-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-200 text-xs"
           >
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -271,11 +271,11 @@ export const CompleteProfileStep: React.FC<CompleteProfileStepProps> = ({
 
             {/* Profile Info */}
             <div className="flex-1 min-w-0 text-center sm:text-left">
-              <h1 className="text-2xl font-bold text-white mb-2 break-words">
+              <h1 className="text-2xl font-bold text-white mb-2 wrap-break-words">
                 {formData.username}
               </h1>
               {formData.bio && (
-                <p className="text-gray-300 text-lg leading-relaxed break-words">
+                <p className="text-gray-300 text-lg leading-relaxed wrap-break-words">
                   {formData.bio}
                 </p>
               )}

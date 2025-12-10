@@ -40,13 +40,10 @@ export default function MainLayout() {
 
   return (
     <div className="flex flex-col  min-h-screen bg-slate-900">
-      {/* Topbar */}
-
       <Topbar />
 
       {/* Main Content Area */}
       <div className="flex flex-1">
-        {/* Sidebar Overlay for mobile */}
         {isMobile && isSidebarOpen && (
           <div
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 lg:hidden"
@@ -54,7 +51,6 @@ export default function MainLayout() {
           />
         )}
 
-        {/* Sidebar */}
         <div
           className={`
           fixed lg:sticky top-20 left-0 h-[calc(100vh-5rem)] z-40
@@ -66,7 +62,6 @@ export default function MainLayout() {
           <Sidebar onClose={closeAllSidebars} />
         </div>
 
-        {/* Main Content */}
         {/* Main Content - Mobile Responsive */}
         <main
           className={`

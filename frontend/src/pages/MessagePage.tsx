@@ -504,7 +504,7 @@ export default function MessagePage() {
                     <div className={`flex space-x-3 max-w-xs lg:max-w-md ${isOwnMessage ? 'flex-row-reverse space-x-reverse' : ''}`}>
                       {/* Avatar */}
                       {!isOwnMessage && (
-                        <div className="w-10 h-10 bg-linear-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0">
+                        <div className="w-10 h-10 bg-linear-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-white font-bold shrink-0">
                           {sender?.avatar || '?'}
                         </div>
                       )}

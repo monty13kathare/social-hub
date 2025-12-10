@@ -17,10 +17,6 @@ import UserSearchPage from "../pages/UserSearchPage";
 import PostSearchPage from "../pages/PostSearchPage";
 import UserProfile from "../pages/UserProfile";
 import Profile from "../pages/Profile";
-// import UsersManagement from "../components/dashboard/UsersManagement";
-// import PostsAnalytics from "../components/dashboard/PostsAnalytics";
-// import CommunitiesManagement from "../components/dashboard/CommunitiesManagement";
-// import Dashboard from "../components/dashboard/Dashboard";
 
 export default function AppRoutes() {
   return (
@@ -42,7 +38,6 @@ export default function AppRoutes() {
         <Route path="messages/:id" element={<ChatTest />} />
         <Route path="explore" element={<ExplorePage />} />
         <Route path="premium" element={<Premium />} />
-        {/* <Route path="dashboard" element={<Dashboard />} /> */}
 
 
         {/* Communities */}
@@ -50,10 +45,7 @@ export default function AppRoutes() {
         <Route path="communities/create" element={<CreateCommunity />} />
         <Route path="communities/:id" element={<CommunityDetail />} />
 
-         {/* <Route path="/admin" element={<Dashboard />} />
-        <Route path="/admin/users" element={<UsersManagement />} />
-        <Route path="/admin/posts" element={<PostsAnalytics />} />
-        <Route path="/admin/communities" element={<CommunitiesManagement />} /> */}
+        
 
       </Route>
 

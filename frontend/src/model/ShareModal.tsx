@@ -632,7 +632,6 @@ interface ShareButtonProps {
 }
 
 const ShareButton: React.FC<ShareButtonProps> = ({
-  platform,
   label,
   icon,
   color,

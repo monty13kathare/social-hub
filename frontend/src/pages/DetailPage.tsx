@@ -1,9 +1,7 @@
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import PostCard from '../components/card/PostCard';
-import Post from '../components/card/Post';
-import { getUser } from '../utils/userStorage';
-import { toggleLike } from '../api/userPost';
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import Post from "../components/card/Post";
+import { toggleLike } from "../api/userPost";
 
 interface Post {
   id: string;
@@ -27,73 +25,46 @@ export default function DetailPage() {
   const { postId } = useParams();
   const navigate = useNavigate();
   const [post, setPost] = useState<Post | null>(null);
-  const [comment, setComment] = useState('');
+  const [comment, setComment] = useState("");
   const { state } = useLocation();
 
   const postDetail = state;
 
-  const currentUser = getUser();
-
-  console.log('postDetail', state)
-
   useEffect(() => {
-    // Mock data - in real app, fetch by postId
-    // const mockPost: Post = {
-    //   id: '1',
-    //   user: {
-    //     name: 'Sarah Wilson',
-    //     username: '@sarahw',
-    //     avatar: 'SW',
-    //     verified: true
-    //   },
-    //   content: 'Just launched our new AI-powered design tool! 🚀 So excited to see what the community creates with it. #AI #Design #Innovation',
-    //   image: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=500',
-    //   timestamp: '2h ago',
-    //   likes: 245,
-    //   comments: 36,
-    //   shares: 12,
-    //   isLiked: false,
-    //   isBookmarked: false
-    // };
     setPost(postDetail);
   }, [postId]);
 
   const handleLike = async (postId: string) => {
     try {
-       await toggleLike(postId);
-      // const updatedPost = res.data?.post;
-  
-      // setPosts((prev) =>
-      //   prev.map((post) => (post._id === postId ? updatedPost : post))
-      // );
+      await toggleLike(postId);
     } catch (err) {
       console.error("Error liking post:", err);
     }
   };
-   const handleComment = (postId: string) => {
+  const handleComment = () => {
     if (post) {
       setPost({
         ...post,
         likes: post.isLiked ? post.likes - 1 : post.likes + 1,
-        isLiked: !post.isLiked
+        isLiked: !post.isLiked,
       });
     }
   };
-   const handleDelete = (postId: string) => {
+  const handleDelete = () => {
     if (post) {
       setPost({
         ...post,
         likes: post.isLiked ? post.likes - 1 : post.likes + 1,
-        isLiked: !post.isLiked
+        isLiked: !post.isLiked,
       });
     }
   };
 
-  const handleUpdate = (postId: string) => {
+  const handleUpdate = () => {
     if (post) {
       setPost({
         ...post,
-        isBookmarked: !post.isBookmarked
+        isBookmarked: !post.isBookmarked,
       });
     }
   };
@@ -119,22 +90,23 @@ export default function DetailPage() {
 
       {/* Main Post */}
       <Post
-       key={postDetail._id}
-            post={postDetail}
-            currentUser={currentUser}
-            onUpdate={handleUpdate}
-            onDelete={handleDelete}
-            onLike={handleLike}
-            onComment={handleComment}
+        key={postDetail._id}
+        post={postDetail}
+        onUpdate={handleUpdate}
+        onDelete={handleDelete}
+        onLike={handleLike}
+        onComment={handleComment}
       />
 
       {/* Comments Section */}
       <div className="mt-6 bg-slate-800/50 backdrop-blur-xl rounded-2xl p-6 border border-purple-500/20">
-        <h3 className="text-white font-bold text-lg mb-4">Comments ({postDetail.comments})</h3>
+        <h3 className="text-white font-bold text-lg mb-4">
+          Comments ({postDetail.comments})
+        </h3>
 
         {/* Add Comment */}
         <div className="flex space-x-4 mb-6">
-          <div className="w-10 h-10 bg-linear-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+          <div className="w-10 h-10 bg-linear-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold shrink-0">
             JD
           </div>
           <div className="flex-1">
@@ -147,7 +119,7 @@ export default function DetailPage() {
             />
             <div className="flex justify-end mt-2">
               <button
-                onClick={() => setComment('')}
+                onClick={() => setComment("")}
                 disabled={!comment.trim()}
                 className="bg-linear-to-r from-purple-600 to-pink-600 text-white px-6 py-2 rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -160,8 +132,11 @@ export default function DetailPage() {
         {/* Comments List */}
         <div className="space-y-4">
           {[...Array(3)].map((_, index) => (
-            <div key={index} className="flex space-x-4 p-4 rounded-2xl hover:bg-slate-700/30 transition-all">
-              <div className="w-10 h-10 bg-linear-to-r from-cyan-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+            <div
+              key={index}
+              className="flex space-x-4 p-4 rounded-2xl hover:bg-slate-700/30 transition-all"
+            >
+              <div className="w-10 h-10 bg-linear-to-r from-cyan-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold shrink-0">
                 U{index + 1}
               </div>
               <div className="flex-1">
@@ -171,7 +146,8 @@ export default function DetailPage() {
                 </div>
                 <p className="text-white">
                   This is an amazing post! Really love the insights shared here.
-                  {index === 0 && " Can't wait to see more content like this! 🚀"}
+                  {index === 0 &&
+                    " Can't wait to see more content like this! 🚀"}
                 </p>
                 <div className="flex items-center space-x-4 mt-2">
                   <button className="text-slate-400 hover:text-red-500 transition-colors text-sm">

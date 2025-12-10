@@ -1,4 +1,3 @@
-// components/CommunityCard.tsx (Updated)
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUser } from "../../utils/userStorage";
@@ -10,15 +9,11 @@ import DeleteModal from "../../model/DeleteModal";
 interface CommunityCardProps {
   community: any;
   toggleJoinCommunity: (community: any) => void;
-  // onDeleteCommunity: (communityId: string) => void;
-  // onUpdateCommunity: (updatedCommunity: any) => void; // Add this prop
 }
 
 const CommunityCard: React.FC<CommunityCardProps> = ({
   community,
   toggleJoinCommunity,
-  // onDeleteCommunity,
-  // onUpdateCommunity,
 }) => {
   const navigate = useNavigate();
   const currentUser = getUser();
@@ -50,7 +45,7 @@ const CommunityCard: React.FC<CommunityCardProps> = ({
 
  
 
-  const handleUpdateCommunity = (updatedCommunity: any) => {
+  const handleUpdateCommunity = () => {
     // onUpdateCommunity(updatedCommunity);
     setIsEditModalOpen(false);
   };
@@ -60,15 +55,10 @@ const CommunityCard: React.FC<CommunityCardProps> = ({
     setIsDeleting(true);
     try {
       await deleteCommunity(community._id);
-      // onDeleteCommunity(community._id);
       setIsDeleteModalOpen(false);
       window.location.reload();
-      // Optional: Show success toast/message
-      // toast.success('Community deleted successfully!');
     } catch (error) {
       console.error('Error deleting community:', error);
-      // Optional: Show error toast/message
-      // toast.error('Failed to delete community. Please try again.');
     } finally {
       setIsDeleting(false);
     }

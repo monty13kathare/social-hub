@@ -34,7 +34,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
           {/* Header with Icon */}
           <div className="flex items-start">
             {/* Icon Container */}
-            <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-900/30 sm:mx-0 sm:h-10 sm:w-10">
+            <div className="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-red-900/30 sm:mx-0 sm:h-10 sm:w-10">
               <svg 
                 className="h-6 w-6 text-red-400" 
                 fill="none" 
@@ -69,7 +69,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
               type="button"
               disabled={isLoading}
               onClick={onConfirm}
-              className="inline-flex w-full items-center justify-center rounded-lg bg-gradient-to-r from-red-600 to-red-700 px-4 py-2.5 text-sm font-semibold text-white shadow-lg hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:from-red-800 disabled:to-red-900 disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200 sm:ml-3 sm:w-auto"
+              className="inline-flex w-full items-center justify-center rounded-lg bg-linear-to-r from-red-600 to-red-700 px-4 py-2.5 text-sm font-semibold text-white shadow-lg hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:from-red-800 disabled:to-red-900 disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200 sm:ml-3 sm:w-auto"
             >
               {isLoading ? (
                 <>

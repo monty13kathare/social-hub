@@ -18,7 +18,7 @@ export default function CommunityDetail() {
   );
   const isAdmin = community?.createdBy?._id === currentUser?._id;
 
-const canPost = isMember || isAdmin;
+  const canPost = isMember || isAdmin;
 
   const [activeTab, setActiveTab] = useState<"posts" | "members" | "about">(
     "posts"
@@ -217,7 +217,7 @@ const canPost = isMember || isAdmin;
                   Leave
                 </button>
               )}
-               {isAdmin && (
+              {isAdmin && (
                 <button
                   onClick={handleLeaveClick}
                   className="px-6 py-3 bg-slate-800/50 text-white rounded-xl font-semibold hover:bg-slate-700/50 transition-all duration-200 border border-slate-600/50 backdrop-blur-sm"
@@ -247,13 +247,19 @@ const canPost = isMember || isAdmin;
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-slate-400">Online Now</span>
-                  <span className="text-green-400 font-semibold">{community?.members?.length || 0}</span>
+                  <span className="text-green-400 font-semibold">
+                    {community?.members?.length || 0}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-slate-400">Your Status</span>
                   <span
                     className={`font-semibold ${
-                      isMember ? "text-green-400" : isAdmin ? "text-purple-500" : "text-yellow-400"
+                      isMember
+                        ? "text-green-400"
+                        : isAdmin
+                        ? "text-purple-500"
+                        : "text-yellow-400"
                     }`}
                   >
                     {isMember ? "Member" : isAdmin ? "Creator" : "Visitor"}
@@ -300,7 +306,7 @@ const canPost = isMember || isAdmin;
                     <span>💻</span>
                     <span>Share Code</span>
                   </button>
-                   <button
+                  <button
                     onClick={() => {
                       setIsCreatingPost(true);
                     }}
@@ -396,13 +402,13 @@ const canPost = isMember || isAdmin;
                                   {getRoleBadge(post.author.role)}
                                 </span>
                               )} */}
-                               <span
-                                  className={`px-2 py-1 text-xs rounded-lg border ${getRoleColor(
-                                    "member"
-                                  )}`}
-                                >
-                                  {getRoleBadge(post.author.role)}
-                                </span>
+                            <span
+                              className={`px-2 py-1 text-xs rounded-lg border ${getRoleColor(
+                                "member"
+                              )}`}
+                            >
+                              {getRoleBadge(post.author.role)}
+                            </span>
                             <span className="text-slate-400 text-sm">
                               {post.author?.username}
                             </span>

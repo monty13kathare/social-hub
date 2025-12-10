@@ -36,7 +36,7 @@ export default function PostCard({ post, onLike, onBookmark, onComment, onShare 
       {/* User Info */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
-          <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+          <div className="w-12 h-12 bg-linear-to-r from-cyan-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold">
             {post.user.avatar}
           </div>
           <div>
@@ -126,13 +126,13 @@ export default function PostCard({ post, onLike, onBookmark, onComment, onShare 
           <div className="space-y-3">
             {/* Mock comments */}
             <div className="flex space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex-shrink-0"></div>
+              <div className="w-8 h-8 bg-linear-to-r from-green-500 to-emerald-500 rounded-full shrink-0"></div>
               <div className="flex-1 bg-slate-700/30 rounded-2xl p-3">
                 <p className="text-white text-sm"><strong>Alex Chen</strong> Great post! Really insightful.</p>
               </div>
             </div>
             <div className="flex space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex-shrink-0"></div>
+              <div className="w-8 h-8 bg-linear-to-r from-orange-500 to-red-500 rounded-full shrink-0"></div>
               <div className="flex-1 bg-slate-700/30 rounded-2xl p-3">
                 <p className="text-white text-sm"><strong>Maria Garcia</strong> Thanks for sharing this! 🚀</p>
               </div>

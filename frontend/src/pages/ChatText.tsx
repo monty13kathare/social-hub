@@ -1,4 +1,3 @@
-// src/components/ChatTest.tsx
 import Chat from './Chat';
 
 export default function ChatTest() {
@@ -16,8 +15,6 @@ export default function ChatTest() {
             <div className="h-full max-w-4xl mx-auto">
                 <Chat 
                     user={testUser}
-                    // onBack={() => console.log('Back clicked')}
-                    // isMobile={false}
                 />
             </div>
         </div>
