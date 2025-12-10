@@ -26,12 +26,12 @@ app.use(
   cors({
     origin: allowedOrigins,
     credentials: true,
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   })
 );
 
-// Preflight
-// app.options("*", cors());
+// Handle preflight requests
+app.options("*", cors());
 
 // ------------------------
 // Middleware
