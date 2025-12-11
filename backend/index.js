@@ -9,13 +9,7 @@ import userPostRoutes from "./routes/userPost.routes.js";
 import communityPostRoutes from "./routes/communityPost.routes.js";
 import communityRoutes from "./routes/community.routes.js";
 
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config({ path: "config/config.env" });
-}
-
-// dotenv.config();
-
-
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -23,37 +17,17 @@ const PORT = process.env.PORT || 5000;
 // ------------------------
 // CORS
 // ------------------------
-// const allowedOrigins = [
-//   "http://localhost:5173",
-//   "https://social-hub-cd42.vercel.app",
-// ];
-
-// app.use(
-//   cors({
-//     origin: allowedOrigins,
-//     credentials: true,
-//     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-//   })
-// );
-
-// // Handle preflight requests
-// app.options("*", cors());
-
 const corsOptions = {
   origin: [
     "http://localhost:5173",
+    "https://social-hub-seven.vercel.app"
   ],
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  preflightContinue: false,
-  optionsSuccessStatus: 204,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   credentials: true,
+  optionsSuccessStatus: 204,
 };
 
-// Apply CORS middleware to handle cross-origin requests
-app.use(cors(corsOptions));
-
-// Preflight requests handling
-app.options("*", cors(corsOptions));
+app.use(cors(corsOptions));    // 👈 USE CORS OPTIONS
 
 // ------------------------
 // Middleware
@@ -77,7 +51,6 @@ app.get("/", (_, res) => {
 // ------------------------
 // Start App Only When DB Ready
 // ------------------------
-
 async function startServer() {
   try {
     await connectDB();

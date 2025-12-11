@@ -104,7 +104,7 @@ export const CommunityActionModal: React.FC<CommunityActionModalProps> = ({
       className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       onClick={handleBackdropClick}
     >
-      <div className="bg-slate-800 rounded-3xl border border-slate-700/50 p-6 max-w-md w-full transform transition-all duration-300">
+      <div className="bg-slate-800 rounded-3xl border border-slate-700/50 p-6 max-w-md w-full max-h-[90vh] lg:h-fit custom-scrollbar overflow-scroll lg:overflow-hidden transform transition-all duration-300">
         {/* Header */}
         <div className="text-center mb-4">
           <div className="text-3xl mb-2">{icon}</div>
@@ -168,7 +168,7 @@ export const CommunityActionModal: React.FC<CommunityActionModalProps> = ({
         )}
 
         {/* Actions */}
-        <div className="flex space-x-3">
+        <div className="flex flex-col md:flex-row space-x-3">
           <button
             onClick={handleClose}
             disabled={isLoading}

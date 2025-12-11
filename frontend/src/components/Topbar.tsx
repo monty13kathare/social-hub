@@ -1,15 +1,15 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, type ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { removeToken } from '../utils/cookieHelper';
 import { getUser, removeUser } from '../utils/userStorage';
 import { getInitials } from '../utils/helper';
-import { Bell, MessageCircle } from 'lucide-react';
+import { Bell, Box, House, MessageCircle, Settings, ShieldPlus, Users } from 'lucide-react';
 
 type NavigationItem = {
   id: string;
   label: string;
   path: string;
-  icon?: string;
+  icon?: ReactNode;
 };
 
 export default function Topbar() {
@@ -25,10 +25,10 @@ export default function Topbar() {
 
 
   const navigationItems: NavigationItem[] = [
-    { id: 'home', label: 'Home', path: '/' },
-    { id: 'friends', label: 'Friends', path: '/users' },
-    { id: 'communities', label: 'Communities', path: '/communities' },
-    { id: 'settings', label: 'Settings', path: '/settings' },
+    { id: 'home', label: 'Home', path: '/',icon: <House />  },
+    { id: 'friends', label: 'Friends', path: '/users', icon: <Users /> },
+    { id: 'communities', label: 'Communities', path: '/communities',  icon: <Box /> },
+    { id: 'settings', label: 'Settings', path: '/settings', icon: <Settings /> },
   ];
 
   const mobileMenuItems: NavigationItem[] = [
@@ -36,7 +36,7 @@ export default function Topbar() {
     // { id: 'notifications', label: 'Notifications', path: '/notifications', icon: '🔔' },
     // { id: 'messages', label: 'Messages', path: '/messages' },
     // { id: 'settings', label: 'Settings', path: '/settings', icon: '⚙️' },
-    { id: 'premium', label: 'Premium', path: '/premium' },
+    { id: 'premium', label: 'Premium', path: '/premium', icon: <ShieldPlus/> },
 
   ];
 
@@ -131,12 +131,13 @@ export default function Topbar() {
               <button
                 key={item.id}
                 onClick={() => handleNavigation(item)}
-                className={`px-4 lg:px-6 py-2 rounded-xl transition-all duration-200 capitalize font-medium ${activeTab === item.id
+                className={`px-4 lg:px-6 py-2 rounded-xl transition-all duration-200 capitalize font-medium flex gap-4 ${activeTab === item.id
                     ? 'text-white bg-linear-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 shadow-lg shadow-purple-500/10'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-600/50'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-600/50'
                   }`}
               >
-                {item.label}
+                {item.icon}
+                <span>{item.label}</span>
               </button>
             ))}
           </div>
@@ -203,7 +204,7 @@ export default function Topbar() {
                         onClick={() => handleProfileMenuItemClick(item)}
                         className={`w-full flex items-center space-x-3 px-3 py-3 rounded-lg transition-all duration-200 text-left ${item.id === 'logout'
                             ? 'text-red-400 hover:text-red-300 hover:bg-red-500/10'
-                            : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
+                            : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
                           }`}
                       >
                         <span className="text-lg w-6 text-center">{item.icon}</span>
@@ -228,7 +229,7 @@ export default function Topbar() {
             className="bg-slate-800/95 border-b border-purple-500/20 backdrop-blur-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-4 space-y-2">
+            <div className="p-8 space-y-2">
               {mobileMenuItems.map((item) => (
                 <button
                   key={item.id}

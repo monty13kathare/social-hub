@@ -354,7 +354,7 @@ export default function EditCommunityModal({
           </div>
 
           {/* Footer Buttons */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-700/50">
+          <div className="flex flex-col md:flex-row justify-end gap-3 pt-4 border-t border-slate-700/50">
             <button
               type="button"
               onClick={onClose}

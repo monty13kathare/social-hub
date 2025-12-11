@@ -230,7 +230,7 @@ export default function CreatePost({ community, currentUser, onPostCreated, onCa
     ];
 
     return (
-        <div className="bg-slate-800/50 rounded-2xl border border-slate-700/50 p-6 mb-6">
+        <div className="bg-slate-800/50 rounded-2xl border border-slate-700/50 p-4 mb-6">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-white font-semibold text-lg">Create Post in {community.name}</h3>
                 <button

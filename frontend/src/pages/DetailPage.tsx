@@ -2,6 +2,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Post from "../components/card/Post";
 import { toggleLike } from "../api/userPost";
+import { formatTimeAgo } from "../utils/helper";
 
 interface Post {
   id: string;
@@ -22,13 +23,16 @@ interface Post {
 }
 
 export default function DetailPage() {
+    const location = useLocation();
   const { postId } = useParams();
   const navigate = useNavigate();
   const [post, setPost] = useState<Post | null>(null);
   const [comment, setComment] = useState("");
-  const { state } = useLocation();
 
-  const postDetail = state;
+  // const postDetail = state;
+   const postDetail = location.state?.post;
+
+   console.log('postDetail', postDetail)
 
   useEffect(() => {
     setPost(postDetail);
@@ -78,10 +82,10 @@ export default function DetailPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto mt-5">
       {/* Back Button */}
       <button
-        onClick={() => navigate(-1)}
+        onClick={() => navigate("/")}
         className="flex items-center space-x-2 text-slate-400 hover:text-white mb-6 transition-colors"
       >
         <span>←</span>
@@ -101,13 +105,13 @@ export default function DetailPage() {
       {/* Comments Section */}
       <div className="mt-6 bg-slate-800/50 backdrop-blur-xl rounded-2xl p-6 border border-purple-500/20">
         <h3 className="text-white font-bold text-lg mb-4">
-          Comments ({postDetail.comments})
+          Comments ({postDetail.comments?.length})
         </h3>
 
         {/* Add Comment */}
         <div className="flex space-x-4 mb-6">
           <div className="w-10 h-10 bg-linear-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold shrink-0">
-            JD
+              <img src={postDetail?.author?.avatar} alt="avatar" className="w-full h-full overflow-hidden rounded-full object-cover" />
           </div>
           <div className="flex-1">
             <textarea
@@ -131,23 +135,23 @@ export default function DetailPage() {
 
         {/* Comments List */}
         <div className="space-y-4">
-          {[...Array(3)].map((_, index) => (
+          {postDetail.comments?.map((item:any, index:any) => (
             <div
               key={index}
               className="flex space-x-4 p-4 rounded-2xl hover:bg-slate-700/30 transition-all"
             >
               <div className="w-10 h-10 bg-linear-to-r from-cyan-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold shrink-0">
-                U{index + 1}
+                <img src={item?.user?.avatar} alt="avatar" className="w-full h-full overflow-hidden rounded-full object-cover" />
+                
               </div>
               <div className="flex-1">
                 <div className="flex items-center space-x-2 mb-1">
-                  <h4 className="text-white font-semibold">User {index + 1}</h4>
-                  <span className="text-slate-400 text-sm">· 2h ago</span>
+                  <h4 className="text-white font-semibold">{item?.user?.name}</h4>
+                  <span className="text-slate-400 text-sm">{formatTimeAgo(item.createdAt)}</span>
                 </div>
                 <p className="text-white">
-                  This is an amazing post! Really love the insights shared here.
-                  {index === 0 &&
-                    " Can't wait to see more content like this! 🚀"}
+                 {item?.text}
+                 
                 </p>
                 <div className="flex items-center space-x-4 mt-2">
                   <button className="text-slate-400 hover:text-red-500 transition-colors text-sm">

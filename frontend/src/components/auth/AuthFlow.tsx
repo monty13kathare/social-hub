@@ -11,6 +11,7 @@ import { CompleteProfileStep } from "./CompleteProfileStep";
 import { LoginStep } from "./LoginStep";
 import {
   completeProfile,
+  googleLogin,
   loginUser,
   registerUser,
   verifyOtp,
@@ -18,6 +19,8 @@ import {
 import { setToken } from "../../utils/cookieHelper";
 import { setUser } from "../../utils/userStorage";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useGoogleLogin } from "@react-oauth/google";
 
 type AuthStep = "register" | "verify-otp" | "complete-profile" | "login";
 
@@ -117,6 +120,37 @@ export const AuthFlow: React.FC = () => {
     setError(null);
   };
 
+  // Google login handler
+  const googleSignin = useGoogleLogin({
+    onSuccess: async (tokenResponse: any) => {
+      try {
+        const data = await axios.get(
+          "https://www.googleapis.com/oauth2/v3/userinfo",
+          {
+            headers: { Authorization: `Bearer ${tokenResponse?.access_token}` },
+          }
+        );
+        const userInfo = data?.data;
+        if (userInfo) {
+          const data = {
+            email: userInfo.email,
+            name: userInfo.name,
+            avatar: userInfo.picture,
+          };
+          const response = await googleLogin(data);
+
+          const userPayload = response.data;
+          setToken(userPayload?.token);
+          setUser(userPayload?.user);
+
+          navigate("/");
+        }
+      } catch (error) {
+        console.error("Google login failed:", error);
+      }
+    },
+  });
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-900 ">
       <div className="max-w-md w-full bg-slate-800 rounded-2xl shadow-xl ">
@@ -188,6 +222,7 @@ export const AuthFlow: React.FC = () => {
           {/* Step Components */}
           {currentStep === "register" && (
             <RegisterStep
+              onGoogleSignIn={googleSignin}
               onSubmit={handleRegister}
               loading={loading}
               onSwitchToLogin={switchToLogin}
@@ -214,6 +249,7 @@ export const AuthFlow: React.FC = () => {
 
           {currentStep === "login" && (
             <LoginStep
+              onGoogleSignIn={googleSignin}
               onSubmit={handleLogin}
               loading={loading}
               onSwitchToRegister={switchToRegister}

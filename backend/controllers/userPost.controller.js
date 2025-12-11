@@ -83,15 +83,56 @@ export const createUserPost = async (req, res) => {
   }
 };
 
+// export const getAllPosts = async (req, res) => {
+//   try {
+//     const posts = await UserPost.find()
+      
+//       .populate(postPopulateFields)
+//       .sort({ createdAt: -1 });
+//     res.status(200).json({
+//       success: true,
+//       count: posts.length,
+//       posts,
+//     });
+//   } catch (error) {
+//     console.error("❌ Error fetching posts:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Server error",
+//       error: error.message,
+//     });
+//   }
+// };
+
 export const getAllPosts = async (req, res) => {
   try {
-    const posts = await UserPost.find()
-      
+    const limit = parseInt(req.query.limit) || 10;
+    const cursor = req.query.cursor || null;
+
+    const query = cursor
+      ? { _id: { $lt: cursor } } // load posts older than last cursor
+      : {};
+
+    const posts = await UserPost.find(query)
       .populate(postPopulateFields)
-      .sort({ createdAt: -1 });
+      .sort({ _id: -1 })     // newest first, stable for cursor pagination
+      .limit(limit + 1);     // load 1 extra to detect hasMore
+
+    let hasMore = false;
+
+    if (posts.length > limit) {
+      hasMore = true;
+      posts.pop(); // remove extra post
+    }
+
+    // next cursor = last post's id
+    const nextCursor = hasMore ? posts[posts.length - 1]._id : null;
+
     res.status(200).json({
       success: true,
       count: posts.length,
+      hasMore,
+      nextCursor,
       posts,
     });
   } catch (error) {
@@ -103,6 +144,7 @@ export const getAllPosts = async (req, res) => {
     });
   }
 };
+
 
 export const updatePost = async (req, res) => {
   try {

@@ -36,3 +36,7 @@ export const completeProfile = (data: any) => API.post("/complete-profile", data
 // ✅ Login
 export const loginUser = (data: { email: string; password: string }) =>
     API.post("/login", data);
+
+// ✅ Google Login
+export const googleLogin = (data:any) =>
+    API.post("/social-login", data);

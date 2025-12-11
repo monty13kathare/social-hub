@@ -5,6 +5,8 @@ import { addReplyAPI, votePollAPI } from "../../api/post";
 import { getUser } from "../../utils/userStorage";
 import { useNavigate } from "react-router-dom";
 import EditPostModal from "../../model/EditPostModal";
+import { SendHorizontal } from "lucide-react";
+
 
 interface PostProps {
   post: any;
@@ -276,7 +278,7 @@ const Post: React.FC<PostProps> = ({
     }
   };
 
- 
+
 
   const handleReply = (commentId: string) => {
     setActiveReply((prev) => (prev === commentId ? null : commentId));
@@ -331,13 +333,20 @@ const Post: React.FC<PostProps> = ({
   };
 
   const likeComment = () => {
-    
+
   }
 
-   const redirectUser = (userId:string) => {
-        navigate(`/user/${userId}`);
-        window.scrollTo(0,0);
-    }
+  const redirectUser = (userId: string) => {
+    navigate(`/user/${userId}`);
+    window.scrollTo(0, 0);
+  }
+
+  const handleDetailPost = (postId:string,post:any) => {
+     navigate(`/post/${postId}`, {
+    state: { post },  // pass post data here
+  });
+    window.scrollTo(0, 0);
+  }
 
 
   const renderPostContent = () => {
@@ -420,7 +429,7 @@ const Post: React.FC<PostProps> = ({
             )}
             {/* Poll Header */}
             <div className="flex items-start space-x-3 mb-4 sm:mb-6">
-              <div className="w-10 h-10 bg-linear-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shrink-0 shadow-sm">
+              {/* <div className="w-10 h-10 bg-linear-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shrink-0 shadow-sm">
                 <svg
                   className="w-5 h-5 text-white"
                   fill="currentColor"
@@ -428,16 +437,16 @@ const Post: React.FC<PostProps> = ({
                 >
                   <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
                 </svg>
-              </div>
+              </div> */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <h4 className="font-bold text-lg sm:text-xl text-gray-900 dark:text-white leading-tight">
                       {post.poll?.question}
                     </h4>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1.5">
+                    {/* <p className="text-sm text-gray-400 mt-1.5">
                       {!userHasVoted && "Choose your preferred option"}
-                    </p>
+                    </p> */}
                   </div>
                   {timeRemaining && (
                     <div
@@ -582,8 +591,8 @@ const Post: React.FC<PostProps> = ({
                             )}
                           </>
                         ) : (
-                          <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                            {canVote ? "Tap to vote" : "Voting closed"}
+                          <span className="text-xs text-gray-400 font-medium">
+                            {/* {canVote ? "Tap to vote" : "Voting closed"} */}
                           </span>
                         )}
                       </div>
@@ -759,10 +768,10 @@ const Post: React.FC<PostProps> = ({
   return (
     <div className="bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700/50 p-3 sm:p-4 mb-4 transition-colors">
       {/* Post Header */}
-      <div  className="flex items-start justify-between mb-3 sm:mb-4">
-        <div  className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+      <div className="flex items-start justify-between mb-3 sm:mb-4">
+        <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
           <img
-            src={post?.author?.avatar || "/default-avatar.png"}
+            src={post?.author?.avatar}
             alt={post.author?.name}
             onClick={() => redirectUser(post?.author?._id)}
             className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600 shrink-0 cursor-pointer"
@@ -770,14 +779,14 @@ const Post: React.FC<PostProps> = ({
           <div className="flex-1 min-w-0">
             <div className="flex items-center space-x-1 sm:space-x-2 flex-wrap">
               <h3 className="font-semibold text-gray-900 dark:text-white truncate text-sm sm:text-base">
-                {post.author?.username}
+                {post.author?.username || post.author?.name }
               </h3>
               {/* {post?.author?.username && (
                 <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
                   @{post.author?.username}
                 </span>
               )} */}
-            
+
             </div>
             <div className="flex items-center space-x-1 sm:space-x-2 text-xs text-gray-500 dark:text-gray-400 flex-wrap">
               <span>{formatTimeAgo(post.createdAt)}</span>
@@ -832,7 +841,7 @@ const Post: React.FC<PostProps> = ({
         </div>
 
         {/* Options Menu */}
-        <div className="relative shrink-0 z-50" ref={optionsRef}>
+        <div className="relative shrink-0" ref={optionsRef}>
           <button
             onClick={() => setShowOptions(!showOptions)}
             className="p-1 sm:p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
@@ -851,10 +860,10 @@ const Post: React.FC<PostProps> = ({
               {isAuthor ? (
                 <>
                   <button
-                     onClick={() => {
-    setShowEditModal(true);
-    setShowOptions(false);
-  }}
+                    onClick={() => {
+                      setShowEditModal(true);
+                      setShowOptions(false);
+                    }}
                     className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 flex items-center space-x-2 text-sm sm:text-base"
                   >
                     <svg
@@ -935,13 +944,13 @@ const Post: React.FC<PostProps> = ({
                 alt={user.name}
                 className="w-4 h-4 rounded-full object-cover"
               />
-              <span className="text-xs text-pink-700 dark:text-pink-300 font-medium">
+              <span className="text-xs text-purple-700 dark:text-purple-300 font-medium">
                 {user.username}
               </span>
               {isEditing && (
                 <button
                   onClick={() => handleRemoveTag(user._id)}
-                  className="text-pink-500 hover:text-pink-700 ml-1"
+                  className="text-purple-500 hover:text-purple-700 ml-1"
                 >
                   ×
                 </button>
@@ -984,7 +993,7 @@ const Post: React.FC<PostProps> = ({
             <textarea
               value={editedContent}
               onChange={(e) => setEditedContent(e.target.value)}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none text-sm sm:text-base"
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none text-sm sm:text-base"
               rows={4}
               placeholder="What's on your mind?"
             />
@@ -998,7 +1007,7 @@ const Post: React.FC<PostProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowTagPeople(!showTagPeople)}
-                  className="text-pink-600 hover:text-pink-700 text-sm font-medium"
+                  className="text-purple-600 hover:text-purple-700 text-sm font-medium"
                 >
                   {showTagPeople ? "Hide" : "Tag People"}
                 </button>
@@ -1047,7 +1056,7 @@ const Post: React.FC<PostProps> = ({
             <div className="flex space-x-2">
               <button
                 onClick={handleUpdate}
-                className="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700 transition-colors flex-1 font-medium text-sm sm:text-base"
+                className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex-1 font-medium text-sm sm:text-base"
               >
                 Update
               </button>
@@ -1066,10 +1075,11 @@ const Post: React.FC<PostProps> = ({
 
       {/* Image */}
       {post.type !== "poll" && post.image?.url && !isEditing && (
-        <div className="mb-3 sm:mb-4 rounded-lg overflow-hidden">
+        <div className="mb-3 sm:mb-4 rounded-lg overflow-hidden" onClick={() => handleDetailPost(post._id,post)}>
           <img
             src={post.image.url}
             alt="Post attachment"
+            loading="lazy"
             className="w-full h-auto max-h-96 object-cover"
           />
         </div>
@@ -1232,9 +1242,10 @@ const Post: React.FC<PostProps> = ({
               <button
                 onClick={handleAddComment}
                 disabled={!newComment.trim()}
-                className="bg-pink-600 disabled:text-slate-400 text-white px-3 sm:px-4 py-2 rounded-full hover:bg-pink-700 disabled:bg-slate-600 disabled:cursor-not-allowed transition-colors font-medium text-sm"
+                className="bg-purple-600 disabled:text-slate-400 text-white px-3 sm:px-4 py-2 rounded-full hover:bg-purple-700 disabled:bg-slate-600 disabled:cursor-not-allowed transition-colors font-medium text-sm"
               >
-                Post
+                {/* Post */}
+                <SendHorizontal size={16}/>
               </button>
             </div>
           </div>
@@ -1294,7 +1305,7 @@ const Post: React.FC<PostProps> = ({
                   <div className="flex space-x-3 sm:space-x-4 mt-2 text-xs">
                     {/* <button
                       onClick={() => handleLike(comment._id)}
-                      className="text-pink-500 hover:underline"
+                      className="text-purple-500 hover:underline"
                     >
                       {userLiked[comment._id] ? "Unlike" : "Like"} (
                       {likes[comment._id] || 0})
@@ -1327,7 +1338,7 @@ const Post: React.FC<PostProps> = ({
                         </button>
                         <button
                           onClick={() => submitReply(comment._id)}
-                          className="px-2 sm:px-3 py-1 bg-pink-600 text-white rounded-md text-xs sm:text-sm"
+                          className="px-2 sm:px-3 py-1 bg-purple-600 text-white rounded-md text-xs sm:text-sm"
                         >
                           Reply
                         </button>
@@ -1360,7 +1371,7 @@ const Post: React.FC<PostProps> = ({
                           </div>
                           <div onClick={likeComment} className="hover:cursor-pointer">
                             <svg
-                              className="w-4 h-4 text-gray-500"
+                              className="w-3 h-3 text-gray-500"
                               fill={isLiked ? "currentColor" : "none"}
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -1394,14 +1405,14 @@ const Post: React.FC<PostProps> = ({
       )}
 
       {showEditModal && (
-  <EditPostModal
-    isOpen={showEditModal}
-    onClose={() => setShowEditModal(false)}
-    post={post}
-    onSave={onUpdate}
-    onCancel={() => setShowEditModal(false)}
-  />
-)}
+        <EditPostModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          post={post}
+          onSave={onUpdate}
+          onCancel={() => setShowEditModal(false)}
+        />
+      )}
     </div>
   );
 };

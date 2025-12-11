@@ -23,7 +23,10 @@ API.interceptors.request.use((config) => {
 export const createUserPost = (data: any) => API.post("/", data);
 
 // 📜 Get all posts
-export const getAllPosts = () => API.get("/");
+export const getAllPosts = (limit:any, cursor:any) =>
+  API.get("/", {
+    params: { limit, cursor },
+  });
 
 // 👤 Get posts by a specific user
 export const getUserPosts = (userId: string) => API.get(`/user/${userId}`);

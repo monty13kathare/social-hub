@@ -9,8 +9,8 @@ const communityPostSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["text", "code", "question", "achievement", "poll"],
-      default: "text",
+      enum: ["image", "code", "achievement", "poll"],
+      default: "image",
     },
     author: {
       type: mongoose.Schema.Types.ObjectId,

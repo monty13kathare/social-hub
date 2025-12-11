@@ -37,7 +37,7 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
   const tagInputRef = useRef<HTMLInputElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
-
+console.log('taggedUsers', taggedUsers)
 
   const filteredUsers = tagUsers.filter(
     (user) =>
@@ -171,7 +171,7 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
     <div className="fixed inset-0 bg-black/60  flex items-center justify-center p-4 z-50 backdrop-blur-sm">
       <div
         ref={modalRef}
-        className="bg-slate-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-xl transform transition-all"
+        className="bg-slate-900 rounded-2xl w-full max-w-2xl max-h-fit overflow-hidden shadow-xl transform transition-all"
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
@@ -190,9 +190,9 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto max-h-[calc(90vh-140px)] p-6">
+        <div className="overflow-y-auto max-h-[calc(90vh-140px)] p-5 custom-scrollbar flex flex-col gap-4">
           {/* Privacy and Location Settings */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 Privacy
@@ -223,7 +223,7 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
           </div>
 
           {/* Content Textarea */}
-          <div className="mb-6">
+          <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
               Post Content
             </label>
@@ -237,7 +237,7 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
           </div>
 
           {/* Tag People Section */}
-          <div className="mb-6">
+          <div>
             <div className="flex items-center justify-between mb-3">
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
                 Tag People
@@ -245,7 +245,7 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
               <button
                 type="button"
                 onClick={() => setShowTagPeople(!showTagPeople)}
-                className="text-pink-600 hover:text-pink-700 text-sm font-medium"
+                className="text-purple-600 hover:text-purple-700 text-sm font-medium"
               >
                 {showTagPeople ? 'Hide' : 'Tag People'}
               </button>
@@ -257,19 +257,19 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
                 {taggedUsers.map((user) => (
                   <div
                     key={user._id}
-                    className="flex items-center space-x-1 bg-pink-100 dark:bg-pink-900/30 px-2 py-1 rounded-full"
+                    className="flex items-center space-x-1 bg-purple-100 dark:bg-purple-900/30 px-2 py-1 rounded-full"
                   >
                     <img
                       src={user.avatar || '/default-avatar.png'}
                       alt={user.name}
                       className="w-4 h-4 rounded-full object-cover"
                     />
-                    <span className="text-xs text-pink-700 dark:text-pink-300 font-medium">
+                    <span className="text-xs text-purple-700 dark:text-purple-300 font-medium">
                       {user.username}
                     </span>
                     <button
                       onClick={() => handleRemoveTag(user._id)}
-                      className="text-pink-500 hover:text-pink-700 ml-1 text-xs"
+                      className="text-purple-500 hover:text-purple-700 ml-1 text-xs"
                     >
                       ×
                     </button>
@@ -290,7 +290,7 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
                 />
 
                 {tagSearch && filteredUsers.length > 0 && (
-                  <div className="max-h-32 overflow-y-auto border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700">
+                  <div className="max-h-32 overflow-y-auto border border-slate-600 rounded-lg bg-slate-900/60">
                     {filteredUsers.map((user) => (
                       <button
                         key={user._id}
@@ -319,7 +319,7 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
           </div>
 
           {/* Tags Section */}
-          <div className="mb-6">
+          <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
               Tags
             </label>
@@ -365,43 +365,22 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
             </div>
           </div>
 
-          {/* Post Preview */}
-          {/* {post.type !== 'text' && (
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Preview
-              </label>
-              <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-4 border border-slate-200 dark:border-slate-600">
-                <p className="text-slate-600 dark:text-slate-300 text-sm">
-                  {editedContent || 'No content yet...'}
-                </p>
-                {tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {tags.map((tag, index) => (
-                      <span key={index} className="text-xs text-purple-600 dark:text-purple-400">
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          )} */}
+         
         </div>
 
         {/* Footer Actions */}
-        <div className="flex justify-end space-x-3 p-6 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50">
+        <div className="flex justify-between space-x-3 p-5 border-t border-slate-700 bg-slate-900">
           <button
             onClick={handleCancel}
             disabled={isSubmitting}
-            className="px-6 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors font-medium disabled:opacity-50"
+            className="px-6 py-2 border border-slate-600 text-slate-300 rounded-lg hover:bg-slate-600 transition-colors font-medium disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={!editedContent.trim() || isSubmitting}
-            className="px-6 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center space-x-2"
+            className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center space-x-2"
           >
             {isSubmitting && (
               <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">

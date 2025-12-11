@@ -5,9 +5,11 @@ import { CommunityActionModal } from "../model/CommunityActionModal";
 import type { Post } from "../types/types";
 import CreatePost from "../components/CreatePost";
 import { getUser } from "../utils/userStorage";
+import { formatTimeAgo } from "../utils/helper";
 
 export default function CommunityDetail() {
   const { id } = useParams();
+  const [isCopied, setIsCopied] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const currentUser = getUser();
@@ -31,6 +33,7 @@ export default function CommunityDetail() {
   const [isLoading, setIsLoading] = useState(false);
 
   console.log("community", community);
+  console.log('posts', posts)
 
   useEffect(() => {
     const fetchCommunityPost = async () => {
@@ -59,6 +62,29 @@ export default function CommunityDetail() {
       return false;
     } finally {
       setIsLoading(false);
+    }
+  };
+
+   const handleCopyCode = async (post:any) => {
+    try {
+      await navigator.clipboard.writeText(post.code?.code || '');
+      setIsCopied(true);
+
+      // Reset copied status after 2 seconds
+      setTimeout(() => {
+        setIsCopied(false);
+      }, 2000);
+    } catch (err) {
+      console.error('Failed to copy code: ', err);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = post.code?.code || '';
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
     }
   };
 
@@ -150,14 +176,12 @@ export default function CommunityDetail() {
     switch (type) {
       case "code":
         return "💻";
-      case "question":
-        return "❓";
       case "achievement":
         return "🎉";
       case "poll":
         return "📊";
       default:
-        return "📝";
+        return "🖼️";
     }
   };
 
@@ -231,7 +255,7 @@ export default function CommunityDetail() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto  sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar */}
           <div className="lg:col-span-1 space-y-6">
@@ -262,7 +286,7 @@ export default function CommunityDetail() {
                         : "text-yellow-400"
                     }`}
                   >
-                    {isMember ? "Member" : isAdmin ? "Creator" : "Visitor"}
+                    {isMember ? "Member" : isAdmin ? "Admin" : "Visitor"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
@@ -286,7 +310,7 @@ export default function CommunityDetail() {
                     className="w-full text-left p-3 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-xl transition-all duration-200 flex items-center space-x-3"
                   >
                     <span>🖼️</span>
-                    <span>Write Post</span>
+                    <span>Create Post</span>
                   </button>
                   <button
                     onClick={() => {
@@ -388,7 +412,7 @@ export default function CommunityDetail() {
                           />
                         </div>
                         <div className="flex-1">
-                          <div className="flex items-center space-x-2 mb-1">
+                          <div className="flex items-center gap-2 mb-1">
                             <h4 className="text-white font-semibold">
                               {post.author?.name}
                             </h4>
@@ -409,20 +433,24 @@ export default function CommunityDetail() {
                             >
                               {getRoleBadge(post.author.role)}
                             </span>
-                            <span className="text-slate-400 text-sm">
-                              {post.author?.username}
-                            </span>
+                           
                             <span className="text-slate-500">•</span>
-                            {/* <span className="text-slate-400 text-sm">{post.createdAt}</span> */}
+                             <span className={`${getPostTypeColor(post.type)}`}>
+                              {getPostTypeIcon(post.type)}
+                            </span>
                           </div>
-                          <div className="flex items-center space-x-2">
+                          {/* <div className="flex items-center space-x-2">
                             <span className={`${getPostTypeColor(post.type)}`}>
                               {getPostTypeIcon(post.type)}
                             </span>
                             <span className="text-slate-400 text-sm capitalize">
                               {post.type}
                             </span>
-                          </div>
+                          </div> */}
+
+                           <span className="text-slate-400 text-sm">
+                              {formatTimeAgo(post?.createdAt)}
+                            </span>
                         </div>
                       </div>
                     </div>
@@ -432,22 +460,88 @@ export default function CommunityDetail() {
                       <p className="text-slate-300 leading-relaxed whitespace-pre-line mb-4">
                         {post.content}
                       </p>
+                      {post.image && (
+                        <div className="w-full rounded-2xl overflow-hidden">
+                          <img src={post.image.url} alt="image" className="w-full h-auto max-h-96 object-center" />
+                        </div>
+                      )}
+
 
                       {/* Code Block */}
                       {post.code && (
-                        <div className="mt-4 bg-slate-900 rounded-xl border border-slate-700 overflow-hidden">
-                          <div className="flex items-center justify-between px-4 py-2 bg-slate-800 border-b border-slate-700">
-                            <span className="text-slate-300 text-sm font-medium">
-                              {post.code.language}
-                            </span>
-                            <button className="text-slate-400 hover:text-white text-sm">
-                              Copy
-                            </button>
-                          </div>
-                          <pre className="p-4 text-slate-200 text-sm overflow-x-auto">
-                            <code>{post.code.code}</code>
-                          </pre>
-                        </div>
+                        // <div className="mt-4 bg-slate-900 rounded-xl border border-slate-700 overflow-hidden">
+                        //   <div className="flex items-center justify-between px-4 py-2 bg-slate-800 border-b border-slate-700">
+                        //     <span className="text-slate-300 text-sm font-medium">
+                        //       {post.code.language}
+                        //     </span>
+                        //     <button className="text-slate-400 hover:text-white text-sm">
+                        //       Copy
+                        //     </button>
+                        //   </div>
+                        //   <pre className="p-4 text-slate-200 text-sm overflow-x-auto">
+                        //     <code>{post.code.code}</code>
+                        //   </pre>
+                        // </div>
+                         <div className="bg-linear-to-br from-gray-900 to-slate-900 rounded-xl p-4 mt-3 border border-gray-700/50 shadow-lg">
+            {/* Header with language and copy button */}
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <span className="text-xs font-medium text-gray-300 bg-gray-800/50 px-2 py-1 rounded-md border border-gray-700">
+                  {post.code?.language || 'Code'}
+                </span>
+                <button
+                  onClick={() => handleCopyCode(post)}
+                  className={`flex items-center space-x-1.5 text-xs px-3 py-1.5 rounded-lg border transition-all duration-200 font-medium ${isCopied
+                    ? 'bg-green-500/20 text-green-400 border-green-500/30 shadow-sm'
+                    : 'bg-gray-800/50 text-gray-300 border-gray-600 hover:bg-gray-700/50 hover:text-white hover:border-gray-500 active:scale-95'
+                    }`}
+                >
+                  {isCopied ? (
+                    <>
+                      <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      <span>Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      <span>Copy</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Code block */}
+            <div className="relative">
+              <pre className="text-gray-100 overflow-x-auto custom-scrollbar text-sm font-mono max-h-[400px] bg-gray-950/50 rounded-lg p-4 border border-gray-700/30">
+                <code className="block whitespace-pre overflow-x-auto">
+                  {post.code?.code}
+                </code>
+              </pre>
+
+
+            </div>
+
+            {/* File info footer */}
+            <div className="flex justify-between items-center mt-3 text-xs text-gray-400">
+              <span className="flex items-center space-x-1">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+                </svg>
+                <span>Code Snippet</span>
+              </span>
+              <span>{post.code?.code.split('\n').length} lines</span>
+            </div>
+          </div>
                       )}
 
                       {/* Achievement Block */}
@@ -710,23 +804,23 @@ export default function CommunityDetail() {
                     {community.description}
                   </p>
                   <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div className="flex justify-between p-3 bg-slate-800/30 rounded-lg">
+                    <div className="flex flex-col gap-2 md:flex-row justify-between p-3 bg-slate-800/30 rounded-lg">
                       <span className="text-slate-400">Created</span>
                       <span className="text-white">
                         {new Date(community.createdAt).toLocaleDateString()}
                       </span>
                     </div>
-                    <div className="flex justify-between p-3 bg-slate-800/30 rounded-lg">
+                    <div className="flex flex-col gap-2 md:flex-row justify-between p-3 bg-slate-800/30 rounded-lg">
                       <span className="text-slate-400">Category</span>
                       <span className="text-white capitalize">
                         {community.category}
                       </span>
                     </div>
-                    <div className="flex justify-between p-3 bg-slate-800/30 rounded-lg">
+                    <div className="flex flex-col gap-2 md:flex-row justify-between p-3 bg-slate-800/30 rounded-lg">
                       <span className="text-slate-400">Total Posts</span>
-                      <span className="text-white">12.4K</span>
+                      <span className="text-white">{posts?.length || 0}</span>
                     </div>
-                    <div className="flex justify-between p-3 bg-slate-800/30 rounded-lg">
+                    <div className="flex flex-col gap-2 md:flex-row justify-between p-3 bg-slate-800/30 rounded-lg">
                       <span className="text-slate-400">Active Members</span>
                       <span className="text-green-400">87%</span>
                     </div>

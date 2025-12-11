@@ -24,7 +24,7 @@ export default function AppRoutes() {
       {/* 🟩 Protected Routes */}
       <Route element={<PrivateRoute><MainLayout /></PrivateRoute>}>
         <Route index element={<HomeFeed />} />
-        <Route path="post/:id" element={<DetailPage />} />
+        <Route path="post/:postId" element={<DetailPage />} />
         <Route path="profile" element={<Profile />} />
         <Route path="user/:id" element={<UserProfile />} />
         <Route path="settings" element={<SettingsPage />} />

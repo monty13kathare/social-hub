@@ -229,7 +229,7 @@ export default function CreateCommunity() {
 
   return (
     <div className="min-h-screen bg-slate-900 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto  sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">
@@ -810,7 +810,7 @@ export default function CreateCommunity() {
             )}
 
             {/* Navigation Buttons */}
-            <div className="flex justify-between pt-8 border-t border-slate-700/50 mt-8">
+            <div className="flex flex-col md:flex-row justify-between pt-8 border-t border-slate-700/50 mt-8">
               <button
                 type="button"
                 onClick={handlePreviousStep}

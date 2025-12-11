@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import CreateUserPost from "../components/CreateUserPost";
 import { getUser } from "../utils/userStorage";
 import {
@@ -14,6 +14,9 @@ import DeleteModal from "../model/DeleteModal";
 
 export default function HomeFeed() {
   const [posts, setPosts] = useState<any[]>([]);
+const [cursor, setCursor] = useState(null);
+const [hasMore, setHasMore] = useState(true);
+const [loading, setLoading] = useState(false);
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
@@ -71,18 +74,59 @@ export default function HomeFeed() {
 
   const currentUser = getUser();
 
-  const fetchPosts = async () => {
-    try {
-      const res = await getAllPosts();
-      setPosts(res.data?.posts);
-    } catch (error) {
-      console.error("Error fetching communities:", error);
-    }
-  };
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
+
+  const fetchPosts = async () => {
+  if (loading || !hasMore) return;
+
+  setLoading(true);
+
+  try {
+    const res = await getAllPosts(2, cursor);
+    const newPosts = res.data.posts;
+
+    // Prevent duplicates by filtering out posts already in state
+    setPosts(prev => {
+      const ids = new Set(prev.map(p => p._id));
+      const filteredPosts = newPosts.filter((p:any) => !ids.has(p._id));
+      return [...prev, ...filteredPosts];
+    });
+
+    setCursor(res.data.nextCursor);
+    setHasMore(res.data.hasMore);
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+useEffect(() => {
+  fetchPosts();
+}, []);
+
+
+const loadMoreRef = useRef(null);
+
+useEffect(() => {
+  if (!loadMoreRef.current) return;
+
+  const observer = new IntersectionObserver(
+    entries => {
+      if (entries[0].isIntersecting && hasMore && !loading) {
+        fetchPosts();
+      }
+    },
+    { threshold: 1 }
+  );
+
+  observer.observe(loadMoreRef.current);
+
+  return () => observer.disconnect();
+}, [loadMoreRef, hasMore, loading]);
+
+
 
   const handlePostCreated = (newPost: any) => {
     console.log("New post created:", newPost);
@@ -137,7 +181,7 @@ export default function HomeFeed() {
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
       <div className="flex space-x-4">
-        <div className="flex-1">
+        <div className="flex-1 w-full mt-4">
           {/* Create Post Trigger Button */}
           {!showCreatePost && (
             <div
@@ -191,7 +235,7 @@ export default function HomeFeed() {
       <div className="space-y-4">
         {posts.map((post) => (
           <Post
-            key={post._id}
+           key={post._id + post.createdAt}
             post={post}
             onUpdate={handleUpdate}
             onDelete={handleDeleteClick}
@@ -199,6 +243,15 @@ export default function HomeFeed() {
             onComment={handleComment}
           />
         ))}
+
+        <div ref={loadMoreRef} style={{ height: "auto" }}>
+  {loading && <div className="flex items-center justify-center p-8">
+  <div className="relative w-16 h-16">
+    <div className="absolute w-full h-full rounded-full border-4 border-dotted border-gray-300 opacity-20"></div>
+    <div className="absolute w-full h-full rounded-full border-4 border-dotted border-purple-500 border-t-transparent animate-spin"></div>
+  </div>
+</div>}
+</div>
       </div>
 
       {/* Delete Modal */}
