@@ -5,6 +5,9 @@ import UserPost from "../models/UserPost.js";
 import { uploadSingleImage } from "../utils/cloudinaryUpload.js";
 import { postPopulateFields } from "../utils/postPopulateFields.js";
 
+
+
+// ------------------------ UserPost Controller -------------------------------------------
 export const createUserPost = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -83,26 +86,6 @@ export const createUserPost = async (req, res) => {
   }
 };
 
-// export const getAllPosts = async (req, res) => {
-//   try {
-//     const posts = await UserPost.find()
-      
-//       .populate(postPopulateFields)
-//       .sort({ createdAt: -1 });
-//     res.status(200).json({
-//       success: true,
-//       count: posts.length,
-//       posts,
-//     });
-//   } catch (error) {
-//     console.error("❌ Error fetching posts:", error);
-//     res.status(500).json({
-//       success: false,
-//       message: "Server error",
-//       error: error.message,
-//     });
-//   }
-// };
 
 export const getAllPosts = async (req, res) => {
   try {
@@ -115,8 +98,8 @@ export const getAllPosts = async (req, res) => {
 
     const posts = await UserPost.find(query)
       .populate(postPopulateFields)
-      .sort({ _id: -1 })     // newest first, stable for cursor pagination
-      .limit(limit + 1);     // load 1 extra to detect hasMore
+      .sort({ _id: -1 }) // newest first, stable for cursor pagination
+      .limit(limit + 1); // load 1 extra to detect hasMore
 
     let hasMore = false;
 
@@ -137,6 +120,53 @@ export const getAllPosts = async (req, res) => {
     });
   } catch (error) {
     console.error("❌ Error fetching posts:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+export const getPostById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    let post = await UserPost.findById(id)
+      .populate("author", "name username avatar")
+      .populate("taggedUsers", "name username avatar")
+      .populate({
+        path: "comments",
+        populate: [
+          {
+            path: "user",
+            select: "name username avatar"
+          },
+          {
+            path: "likes",
+            select: "name username avatar"
+          },
+          {
+            path: "replies.user",
+            select: "name username avatar"
+          }
+        ]
+      });
+
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      post,
+    });
+
+  } catch (error) {
+    console.error("❌ Error fetching post by ID:", error.message);
     res.status(500).json({
       success: false,
       message: "Server error",
@@ -253,48 +283,159 @@ export const toggleLike = async (req, res) => {
     const userId = req.user._id;
 
     let post = await UserPost.findById(postId);
-    if (!post) return res.status(404).json({ message: "Post not found" });
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
 
-    const isLiked = post.likes.includes(userId);
+    // Toggle like
+    const alreadyLiked = post.likes.includes(userId);
 
-    if (isLiked) {
-      post.likes.pull(userId);
+    if (alreadyLiked) {
+      post.likes = post.likes.filter(
+        (id) => id.toString() !== userId.toString()
+      );
     } else {
       post.likes.push(userId);
     }
 
     await post.save();
 
-    // ⭐ Re-fetch + Populate after save
-    post = await UserPost.findById(postId)
+    // Re-fetch fully populated post
+    const updatedPost = await UserPost.findById(postId)
       .populate("author", "name username avatar")
       .populate("taggedUsers", "name username avatar")
       .populate({
         path: "comments",
         populate: [
-          {
-            path: "user",
-            select: "avatar username name",
-          },
-          {
-            path: "likes",
-            select: "avatar username name",
-          },
-          {
-            path: "replies.user",
-            select: "avatar username name",
-          },
+          { path: "user", select: "name username avatar" },
+          { path: "likes", select: "name username avatar" },
+          { path: "replies.user", select: "name username avatar" },
         ],
       });
 
     res.json({
-      message: isLiked ? "Post unliked" : "Post liked",
-      post,
+      message: alreadyLiked ? "Post unliked" : "Post liked",
+      post: updatedPost,
     });
+  } catch (err) {
+    res.status(500).json({
+      message: "Server Error",
+      error: err.message,
+    });
+  }
+};
+
+// Share Post
+export const sharePost = async (req, res) => {
+  try {
+    const postId = req.params.id;
+
+    const post = await UserPost.findById(postId);
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    post.shares.push({
+      user: req.user._id,
+      sharedAt: new Date(),
+    });
+
+    await post.save();
+
+    res.json({ message: "Post shared successfully", post });
   } catch (err) {
     res.status(500).json({ message: "Server Error", error: err.message });
   }
 };
+
+// Vote Poll
+export const votePoll = async (req, res) => {
+  try {
+    const { optionIndex } = req.body;
+    const userId = req.user._id;
+
+    const post = await UserPost.findById(req.params.postId);
+
+    if (!post) return res.status(404).json({ message: "Post not found" });
+    if (!post.poll)
+      return res.status(400).json({ message: "This post is not a poll" });
+
+    // Already voted?
+    if (post.poll.userVoted.includes(userId)) {
+      return res.status(400).json({ message: "You already voted!" });
+    }
+
+    // Update vote count
+    const currentVotes = post.poll.votes.get(String(optionIndex)) || 0;
+    post.poll.votes.set(String(optionIndex), currentVotes + 1);
+
+    post.poll.totalVotes += 1;
+    post.poll.userVoted.push(userId);
+
+    await post.save();
+
+    return res.json({
+      message: "Vote submitted",
+      votes: Object.fromEntries(post.poll.votes),
+      totalVotes: post.poll.totalVotes,
+      userVoted: post.poll.userVoted,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error voting", error: error.message });
+  }
+};
+
+// Delete All Post
+export const deleteAllUserPosts = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    // Get all posts created by user
+    const posts = await UserPost.find({ author: userId });
+
+    if (!posts.length) {
+      return res.status(404).json({
+        success: false,
+        message: "No posts found for this user",
+      });
+    }
+
+    // OPTIONAL: Delete images from Cloudinary if exist
+    for (const post of posts) {
+      if (post.image?.public_id) {
+        try {
+          await cloudinary.uploader.destroy(post.image.public_id);
+        } catch (err) {
+          console.log(
+            `⚠️ Cloudinary delete failed for ${post._id}:`,
+            err.message
+          );
+        }
+      }
+    }
+
+    // Delete all posts
+    await UserPost.deleteMany({ author: userId });
+
+    // Remove post references from User schema
+    await User.findByIdAndUpdate(userId, { $set: { posts: [] } });
+
+    res.status(200).json({
+      success: true,
+      message: "All posts deleted successfully",
+      deletedCount: posts.length,
+    });
+  } catch (error) {
+    console.error("❌ Error deleting all user posts:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+
+
+// ----------------- Comment Controller ------------------------------------------
 
 // ADD COMMENT
 export const addComment = async (req, res) => {
@@ -359,22 +500,47 @@ export const deleteComment = async (req, res) => {
   try {
     const { postId, commentId } = req.params;
 
-    const post = await UserPost.findById(postId);
-    if (!post) return res.status(404).json({ message: "Post not found" });
+    // 1. Find the comment document
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
 
-    const comment = post.comments.id(commentId);
-    if (!comment) return res.status(404).json({ message: "Comment not found" });
-
-    // only owner can delete
-    if (comment.user.toString() !== req.user._id.toString())
+    // 2. Check owner
+    if (comment.user.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: "Not authorized" });
+    }
 
-    comment.deleteOne();
-    await post.save();
+    // 3. Delete the standalone comment document
+    await Comment.findByIdAndDelete(commentId);
 
-    res.json({ message: "Comment deleted", comments: post.comments });
+    // 4. Remove commentId from UserPost.comments array
+    await UserPost.findByIdAndUpdate(postId, {
+      $pull: { comments: commentId },
+    });
+
+    // 5. Re-fetch updated post with populated comments
+    const post = await UserPost.findById(postId)
+      .populate("author", "name username avatar")
+      .populate("taggedUsers", "name username avatar")
+      .populate({
+        path: "comments",
+        populate: [
+          { path: "user", select: "avatar username name" },
+          { path: "likes", select: "avatar username name" },
+          { path: "replies.user", select: "avatar username name" },
+        ],
+      });
+
+    return res.json({
+      message: "Comment deleted",
+      post,
+    });
   } catch (err) {
-    res.status(500).json({ message: "Server Error", error: err.message });
+    return res.status(500).json({
+      message: "Server Error",
+      error: err.message,
+    });
   }
 };
 
@@ -461,138 +627,28 @@ export const deleteReply = async (req, res) => {
 // LIKE / UNLIKE COMMENT
 export const likeComment = async (req, res) => {
   try {
-    const { postId, commentId } = req.params;
+    const { commentId } = req.params;
+    const userId = req.user._id.toString();
 
-    const post = await UserPost.findById(postId);
-    if (!post) return res.status(404).json({ message: "Post not found" });
-
-    const comment = post.comments.id(commentId);
+    // Find the comment document
+    const comment = await Comment.findById(commentId);
     if (!comment) return res.status(404).json({ message: "Comment not found" });
 
-    const userId = req.user._id.toString();
-    const liked = comment.likes.includes(userId);
+    const liked = comment.likes.some((id) => id.toString() === userId);
 
     if (liked) {
-      // unlike
-      comment.likes.pull(userId);
+      comment.likes = comment.likes.filter((id) => id.toString() !== userId);
     } else {
-      // like
       comment.likes.push(userId);
     }
 
-    await post.save();
+    await comment.save();
 
     res.json({
-      message: liked ? "Unliked comment" : "Liked comment",
+      message: liked ? "Comment unliked" : "Comment liked",
       likes: comment.likes,
     });
   } catch (err) {
     res.status(500).json({ message: "Server Error", error: err.message });
-  }
-};
-
-// Share Post
-export const sharePost = async (req, res) => {
-  try {
-    const postId = req.params.id;
-
-    const post = await UserPost.findById(postId);
-    if (!post) return res.status(404).json({ message: "Post not found" });
-
-    post.shares.push({
-      user: req.user._id,
-      sharedAt: new Date(),
-    });
-
-    await post.save();
-
-    res.json({ message: "Post shared successfully", post });
-  } catch (err) {
-    res.status(500).json({ message: "Server Error", error: err.message });
-  }
-};
-
-// Vote Poll
-export const votePoll = async (req, res) => {
-  try {
-    const { optionIndex } = req.body;
-    const userId = req.user._id;
-
-    const post = await UserPost.findById(req.params.postId);
-
-    if (!post) return res.status(404).json({ message: "Post not found" });
-    if (!post.poll)
-      return res.status(400).json({ message: "This post is not a poll" });
-
-    // Already voted?
-    if (post.poll.userVoted.includes(userId)) {
-      return res.status(400).json({ message: "You already voted!" });
-    }
-
-    // Update vote count
-    const currentVotes = post.poll.votes.get(String(optionIndex)) || 0;
-    post.poll.votes.set(String(optionIndex), currentVotes + 1);
-
-    post.poll.totalVotes += 1;
-    post.poll.userVoted.push(userId);
-
-    await post.save();
-
-    return res.json({
-      message: "Vote submitted",
-      votes: Object.fromEntries(post.poll.votes),
-      totalVotes: post.poll.totalVotes,
-      userVoted: post.poll.userVoted,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Error voting", error: error.message });
-  }
-};
-
-// Delete All Post
-export const deleteAllUserPosts = async (req, res) => {
-  try {
-    const userId = req.user._id;
-
-    // Get all posts created by user
-    const posts = await UserPost.find({ author: userId });
-
-    if (!posts.length) {
-      return res.status(404).json({
-        success: false,
-        message: "No posts found for this user",
-      });
-    }
-
-    // OPTIONAL: Delete images from Cloudinary if exist
-    for (const post of posts) {
-      if (post.image?.public_id) {
-        try {
-          await cloudinary.uploader.destroy(post.image.public_id);
-        } catch (err) {
-          console.log(`⚠️ Cloudinary delete failed for ${post._id}:`, err.message);
-        }
-      }
-    }
-
-    // Delete all posts
-    await UserPost.deleteMany({ author: userId });
-
-    // Remove post references from User schema
-    await User.findByIdAndUpdate(userId, { $set: { posts: [] } });
-
-    res.status(200).json({
-      success: true,
-      message: "All posts deleted successfully",
-      deletedCount: posts.length,
-    });
-
-  } catch (error) {
-    console.error("❌ Error deleting all user posts:", error);
-    res.status(500).json({
-      success: false,
-      message: "Server error",
-      error: error.message,
-    });
   }
 };
